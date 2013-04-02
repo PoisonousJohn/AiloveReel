@@ -312,7 +312,7 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
 }
 - (void) stopAtIndex: (NSUInteger) index {
     state = StateWillStop;
-    stopIndex = index;
+    stopIndex = index % symbolsPerTexture;
 }
 
 - (void) stop {
