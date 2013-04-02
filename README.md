@@ -20,3 +20,7 @@ Usage example
         [reelLocal stopAtIndex:i];
     }]]];
 ```
+
+Limitations
+=========
+Symbols teture should start and end with the same symbol in order to tile NPOT texture
