@@ -4,17 +4,33 @@
 
 
 
-#import <CoreGraphics/CoreGraphics.h>
 #import "AiloveReel.h"
-#import "AiloveReelOffsetTo.h"
-
-NSString * const kAiloveReelIdleStateEventKey       = @"AiloveReelIdle";
-NSString * const kAiloveReelSpinningStateEventKey   = @"AiloveReelSpinning";
-NSString * const kAiloveReelStoppedStateEventKey    = @"AiloveReelStopped";
 
 static const int VertexSize = sizeof(ccV3F_C4B_T2F);
 
 @implementation AiloveReel {
+
+}
+
++ (id)reelWithTexture:(CCTexture2D *)aTexture polygonsCount:(NSUInteger)polygonsCount symbolSize:(CGSize)symbolSize symbolsCount:(NSUInteger)symbolsCount reelHeight:(float)reelHeight {
+    return [[[AiloveReel alloc] initWithTexture: aTexture polygonsCount: polygonsCount symbolSize: symbolSize symbolsCount: symbolsCount reelHeight: reelHeight] autorelease];
+}
+
+
+- (id)initWithTexture:(CCTexture2D *)aTexture polygonsCount:(NSUInteger)polygonsCount symbolSize:(CGSize)symbolSize symbolsCount:(NSUInteger)symbolsCount reelHeight:(float)reelHeight {
+    self.texture = aTexture;
+    self.symbolSize = symbolSize;
+    self.symbolsCount = symbolsCount;
+    self.reelHeight = reelHeight;
+    self.polygonsCount = polygonsCount;
+    self.textureColumn = 0;
+    self.amortization = 0.3f;
+    lastSymbolIndex = 0;
+    _offset = 0;
+
+    NSArray *points = [self meshPoints:polygonsCount];
+
+    return [self initWithPoints: points andTexture: aTexture];
 
 }
 
@@ -34,22 +50,6 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
     return self;
 }
 
-- (id)initWithTexture:(CCTexture2D *)aTexture polygonsCount:(NSUInteger)polygonsCount symbolSize:(CGSize)symbolSize symbolsCount:(NSUInteger)symbolsCount reelHeight:(float)reelHeight {
-    self.texture = aTexture;
-    self.symbolSize = symbolSize;
-    self.symbolsCount = symbolsCount;
-    self.reelHeight = reelHeight;
-    self.polygonsCount = polygonsCount;
-    self.textureColumn = 0;
-    self.amortization = 0.3f;
-    lastSymbolIndex = 0;
-    _offset = 0;
-
-    NSArray *points = [self meshPoints:polygonsCount];
-
-    return [self initWithPoints: points andTexture: aTexture];
-
-}
 
 -(NSArray *) meshPoints: (NSUInteger) segmentsCount {
 
@@ -298,6 +298,7 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
     if (offset < 0) {
         offset = (float)self.texture.pixelsHigh-self.symbolSize.height * CC_CONTENT_SCALE_FACTOR() + offset;
     }
+
     return offset;
 }
 
@@ -338,6 +339,7 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
     if (factualIndex < 0)
         factualIndex = symbolsPerTexture + factualIndex;
     float offset = self.symbolSize.height * (float)factualIndex;
+
     return offset;
 }
 
@@ -345,6 +347,7 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
     float normalizedOffset = [self normalizedOffset];
     float normalizedHeight = self.symbolSize.height * CC_CONTENT_SCALE_FACTOR();
     int index = ((int)ceil((normalizedOffset / normalizedHeight)) + currentSymbolReelIndex ) % (int)ceil(symbolsPerTexture);
+
     return (uint)index;
 }
 
@@ -360,7 +363,7 @@ static const int VertexSize = sizeof(ccV3F_C4B_T2F);
     if (self.spinningBlock)
         self.spinningBlock();
 }
-//
+
 - (void)symbolChangedFrom: (NSUInteger) from to: (NSUInteger) to {
     if (state == StateWillStop && stopIndex == to) {
         state = StateSlowingDown;
