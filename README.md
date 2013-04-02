@@ -23,4 +23,6 @@ Usage example
 
 Limitations
 =========
-Symbols texture should start and end with the same symbol in order to tile NPOT texture
+* Symbols texture should be vertically oriented, symbols goes one by one
+* Symbols texture width should be symbolWidth * columns
+* Symbols texture should start and end with the same symbol in order to tile NPOT texture.
